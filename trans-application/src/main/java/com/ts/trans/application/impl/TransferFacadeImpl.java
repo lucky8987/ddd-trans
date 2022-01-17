@@ -38,10 +38,10 @@ public class TransferFacadeImpl implements TransferFacade {
         TransferApplyResponse response = new TransferApplyResponse();
         // 1. 获取付款方信息
         PayUser payerUser = memberService.getMeberInfo(new MemberId(ContextUtil.getData().getInternalMemberNo()));
-        payerUser.setVerifyMethod(new PayVerifyMethod(transferApplyRequest.getVerifyMethod()));
+        payerUser.setVerifyMethod(PayVerifyMethodEnum.valueOf(transferApplyRequest.getVerifyMethod()));
         payerUser.setPayPwd(new PayPwd(transferApplyRequest.getIdentityCredential()));
         // 1.2 校验支付密码
-        if (PayVerifyMethod.MethodEnum.PASSWORD.getCode().equals(payerUser.getVerifyMethod().getValue())) {
+        if (payerUser.isVerifyByPwd()) {
             memberService.checkPayPwd(payerUser);
         }
         // 1.3 校验付款方权限

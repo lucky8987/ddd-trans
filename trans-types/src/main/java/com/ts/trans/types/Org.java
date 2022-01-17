@@ -12,9 +12,10 @@ public class Org {
 
     private String name;
 
-    public Org() {}
-
     public Org(String code) {
+        if (code == null || code.isEmpty()) {
+            throw new IllegalArgumentException("机构编号不能为空");
+        }
         this.code = code;
     }
 }

@@ -44,7 +44,7 @@ public class PayUser {
     /**
      * 校验方式
      */
-    private PayVerifyMethod verifyMethod;
+    private PayVerifyMethodEnum verifyMethod;
 
 
     /**
@@ -52,7 +52,7 @@ public class PayUser {
      * @return
      */
     public boolean isVerifyByPwd() {
-        return PayVerifyMethod.MethodEnum.PASSWORD.getCode().equals(verifyMethod.getValue());
+        return PayVerifyMethodEnum.PASSWORD == verifyMethod;
     }
 
     /**
@@ -60,7 +60,7 @@ public class PayUser {
      * @return
      */
     public boolean isVerifyByCode() {
-        return PayVerifyMethod.MethodEnum.VERIFY_CODE.getCode().equals(verifyMethod.getValue());
+        return PayVerifyMethodEnum.VERIFY_CODE == verifyMethod;
     }
 
     // 转出

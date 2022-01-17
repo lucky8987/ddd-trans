@@ -14,7 +14,15 @@ public interface OrderInfoRepository {
      * @return
      * @throws Exception
      */
-    OrderInfo find(OrderId id) throws Exception;
+    OrderInfo findByOrderNo(OrderId id) throws Exception;
+
+    /**
+     * 根据主键ID查询订单
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    OrderInfo find(Long id) throws Exception;
 
     /**
      * 保存

@@ -7,10 +7,7 @@ import com.ts.trans.domain.external.CommonService;
 import com.ts.trans.domain.external.MemberService;
 import com.ts.trans.domain.repository.OrderInfoRepository;
 import com.ts.trans.domain.service.TransferService;
-import com.ts.trans.types.Money;
-import com.ts.trans.types.OrderId;
-import com.ts.trans.types.OrderStatusEnum;
-import com.ts.trans.types.OrderTypeEnum;
+import com.ts.trans.types.*;
 import java.math.BigDecimal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,37 +38,55 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public OrderInfo transfer(PayUser sourceUser, PayUser targetAccount, Money money) throws Exception {
 
-        // 校验支付密码
-        if (sourceUser.isVerifyByPwd()) {
-            memberService.checkPayPwd(sourceUser);
-        }
-
         // 获取余额
         sourceUser.setAvailable(memberService.balance(sourceUser.getId()));
         targetAccount.setAvailable(memberService.balance(targetAccount.getId()));
 
-        // 创建订单信息
+        // 构建订单信息
+        OrderInfo orderInfo = buildOrderInfo(sourceUser, targetAccount, money);
+
+        // 落库
+        boolean result = orderInfoRepository.save(orderInfo);
+
+        // 转账金额预扣处理
+        if (result) {
+            sourceUser.withdraw(money);
+            targetAccount.deposit(money);
+        } else {
+            throw new RuntimeException("数据存储失败");
+        }
+
+        // 发起渠道转账
+        OrderStatusEnum statusEnum = channelService.agentPay(sourceUser, targetAccount, money, orderInfo.getOrderType());
+
+        // 失败回退处理
+        if (OrderStatusEnum.FAIL == statusEnum) {
+            targetAccount.withdraw(money);
+            sourceUser.deposit(money);
+        }
+
+        orderInfo.setOrderStatus(statusEnum);
+        return orderInfo;
+    }
+
+    /**
+     * 构建订单
+     * @param sourceUser
+     * @param targetAccount
+     * @param money
+     * @return
+     */
+    private OrderInfo buildOrderInfo(PayUser sourceUser, PayUser targetAccount, Money money) {
         OrderInfo orderInfo = new OrderInfo();
         orderInfo.setOrderId(new OrderId(commonService.getId()));
         orderInfo.setPayer(sourceUser);
         orderInfo.setPayee(targetAccount);
         orderInfo.setTotalAmount(money);
         orderInfo.setPayAmount(money);
-        orderInfo.setFeeAmount(new Money(BigDecimal.ZERO, null));
+        orderInfo.setFeeAmount(new Money(BigDecimal.ZERO, new Currency("CNY")));
         orderInfo.setOrg(sourceUser.getOrg());
         orderInfo.setOrderType(OrderTypeEnum.TRANSFER);
         orderInfo.setOrderStatus(OrderStatusEnum.INIT);
-
-        // 落库
-        orderInfoRepository.save(orderInfo);
-
-        // 转账金额预扣处理
-        sourceUser.deposit(money);
-        targetAccount.deposit(money);
-
-        // 发起渠道转账
-        OrderStatusEnum statusEnum = channelService.agentPay(sourceUser, targetAccount, money, orderInfo.getOrderType());
-        orderInfo.setOrderStatus(statusEnum);
         return orderInfo;
     }
 }

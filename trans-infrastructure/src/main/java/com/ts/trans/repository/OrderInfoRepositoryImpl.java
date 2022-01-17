@@ -1,5 +1,6 @@
 package com.ts.trans.repository;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ts.trans.domain.entity.OrderInfo;
 import com.ts.trans.domain.repository.OrderInfoRepository;
 import com.ts.trans.repository.mapper.OrderInfoMapper;
@@ -22,8 +23,15 @@ public class OrderInfoRepositoryImpl implements OrderInfoRepository {
     private OrderInfoBuilder orderInfoBuilder;
 
     @Override
-    public OrderInfo find(OrderId id) throws Exception {
-        OrderInfoDO orderInfoDO = orderInfoDAO.selectById(id.getValue());
+    public OrderInfo findByOrderNo(OrderId id) throws Exception {
+        OrderInfoDO orderInfoDO = orderInfoDAO
+                .selectOne(new QueryWrapper<OrderInfoDO>().lambda().eq(OrderInfoDO::getOrderNo, id.getStrValue()));
+        return orderInfoBuilder.toOrderInfo(orderInfoDO);
+    }
+
+    @Override
+    public OrderInfo find(Long id) throws Exception {
+        OrderInfoDO orderInfoDO = orderInfoDAO.selectById(id);
         return orderInfoBuilder.toOrderInfo(orderInfoDO);
     }
 

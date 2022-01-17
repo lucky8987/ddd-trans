@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
- * @author 60007833
+ * @author ltf
  */
 @SpringBootApplication(scanBasePackages = "com.ts.trans")
 @MapperScan("com.ts.trans.repository.mapper")

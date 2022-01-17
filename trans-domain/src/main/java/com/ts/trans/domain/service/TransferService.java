@@ -3,6 +3,7 @@ package com.ts.trans.domain.service;
 import com.ts.trans.domain.entity.OrderInfo;
 import com.ts.trans.domain.entity.PayUser;
 import com.ts.trans.types.Money;
+import com.ts.trans.types.OrderId;
 
 /**
  * 转账服务接口
@@ -18,4 +19,5 @@ public interface TransferService {
      * @throws Exception
      */
     OrderInfo transfer(PayUser sourceUser, PayUser targetAccount, Money money) throws Exception;
+
 }
