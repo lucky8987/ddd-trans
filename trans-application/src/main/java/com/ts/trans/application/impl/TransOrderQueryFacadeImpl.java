@@ -37,6 +37,11 @@ public class TransOrderQueryFacadeImpl implements TransOrderQueryFacade {
             orderInfoDTO.setFeeAmount(orderInfo.getFeeAmount().getAmout());
             orderInfoDTO.setOrgCode(orderInfo.getOrg().getCode());
             orderInfoDTO.setSuccessDate(orderInfo.getSuccessDate());
+            orderInfoDTO.setCreateTime(orderInfo.getCreateTime());
+            orderInfoDTO.setPayerId(orderInfo.getPayer().getId().getStrValue());
+            orderInfoDTO.setPayerName(orderInfo.getPayer().getName());
+            orderInfoDTO.setPayeeId(orderInfo.getPayee().getId().getStrValue());
+            orderInfoDTO.setPayeeId(orderInfo.getPayee().getName());
         } catch (Exception e) {
             log.error("订单查询异常", e);
             throw new BFException("订单查询异常，原因:" + e.getMessage());

@@ -4,6 +4,7 @@ import com.ts.trans.domain.entity.OrderInfo;
 import com.ts.trans.domain.entity.PayUser;
 import com.ts.trans.repository.mapper.OrderInfoDO;
 import com.ts.trans.types.*;
+import java.util.Date;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,10 +16,11 @@ public class OrderInfoBuilder {
 
     public OrderInfo toOrderInfo(OrderInfoDO orderInfoDO) throws Exception {
         OrderInfo orderInfo = new OrderInfo();
-        orderInfo.setOrderId(new OrderId(orderInfoDO.getId()));
+        orderInfo.setOrderId(new OrderId(orderInfoDO.getOrderNo()));
         orderInfo.setOrderType(OrderTypeEnum.getByType(orderInfoDO.getOrderType()));
         orderInfo.setOrg(new Org(orderInfoDO.getOrgCode()));
-        orderInfo.setOrderStatus(OrderStatusEnum.valueOf(orderInfoDO.getOrderStatus()));
+        orderInfo.setOrderStatus(OrderStatusEnum.valueOfCode(orderInfoDO.getOrderStatus()));
+        orderInfo.setCreateTime(orderInfoDO.getCreateTime());
         orderInfo.setSuccessDate(orderInfoDO.getSuccessDate());
         PayUser payerUser = new PayUser();
         payerUser.setId(new MemberId(orderInfoDO.getPayerId()));
@@ -26,6 +28,7 @@ public class OrderInfoBuilder {
         payerUser.setName(orderInfoDO.getPayerName());
         payerUser.setChannel(new Channel(orderInfoDO.getChannelCode()));
         orderInfo.setPayer(payerUser);
+        orderInfo.setChannel(payerUser.getChannel());
         PayUser payeeUser = new PayUser();
         payeeUser.setId(new MemberId(orderInfoDO.getPayeeId()));
         payeeUser.setOrg(new Org(orderInfoDO.getOrgCode()));
@@ -33,6 +36,9 @@ public class OrderInfoBuilder {
         payeeUser.setChannel(new Channel(orderInfoDO.getChannelCode()));
         orderInfo.setPayee(payeeUser);
         orderInfo.setChannel(new Channel(orderInfoDO.getChannelCode()));
+        orderInfo.setPayAmount(new Money(orderInfoDO.getPayAmount(), new Currency("CNY")));
+        orderInfo.setTotalAmount(new Money(orderInfoDO.getTotalAmount(), new Currency("CNY")));
+        orderInfo.setFeeAmount(new Money(orderInfoDO.getFeeAmount(), new Currency("CNY")));
         return orderInfo;
     }
 
@@ -50,6 +56,7 @@ public class OrderInfoBuilder {
         orderInfoDO.setChannelCode(orderInfo.getChannel().getCode());
         orderInfoDO.setOrgCode(orderInfo.getOrg().getCode());
         orderInfoDO.setOrderStatus(orderInfo.getOrderStatus().getCode());
+        orderInfoDO.setCreateTime(new Date());
         orderInfoDO.setSuccessDate(orderInfo.getSuccessDate());
         return orderInfoDO;
     }

@@ -21,7 +21,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@TableName("t_order_info")
+@TableName("trans_order_info")
 public class OrderInfoDO implements Serializable {
 
     private static final long serialVersionUID=1L;
